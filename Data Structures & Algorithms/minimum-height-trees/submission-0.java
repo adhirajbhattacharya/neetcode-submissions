@@ -1,0 +1,79 @@
+class Solution {
+    public List<Integer> findMinHeightTrees(int n, int[][] edges) {
+        List<Integer> res = new ArrayList<>();
+        if (n < 3) {
+            for (int i = 0; i < n; i++) {
+                res.add(i);
+            }
+            return res;
+        }
+
+        Graph g = new Graph(n, edges);
+
+        Deque<Integer> q = new ArrayDeque<>();
+
+        for (int i = 0; i < g.v; i++) {
+            if (g.indegrees[i] == 1) {
+                q.offer(i);
+            }
+        }
+
+        while (!q.isEmpty()) {
+            int size = q.size();
+            n -= size;
+            for (int i = 0; i < size; i++) {
+                int curr = q.poll();
+                g.indegrees[curr] = g.indegrees[curr] - 1;
+                // n--;
+                for (int neighbor : g.adj[curr]) {
+                    g.indegrees[neighbor] = g.indegrees[neighbor] - 1;
+                    if (g.indegrees[neighbor] == 1) {
+                        q.offer(neighbor);
+                    }
+                }
+            }
+            if (n <= 2) break;
+        }
+
+        while (!q.isEmpty()) {
+            res.add(q.poll());
+        }
+
+        // for (int i = 0; i < g.v; i++) {
+        //     if (g.indegrees[i] > 0) {
+        //         res.add(i);
+        //     }
+        // }
+
+        return res;
+    }
+}
+
+class Graph {
+    List<Integer>[] adj;
+    int v;
+    int[] indegrees;
+
+    Graph(int n, int[][] edges) {
+        v = n;
+        adj = new List[n];
+        indegrees = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            adj[i] = new ArrayList<>();
+        }
+
+        for (int[] edge : edges) {
+            addEdge(edge);
+        }
+    }
+
+    void addEdge(int[] edge) {
+        int a = edge[0];
+        int b = edge[1];
+        adj[a].add(b);
+        adj[b].add(a);
+        indegrees[a] = indegrees[a] + 1;
+        indegrees[b] = indegrees[b] + 1;
+    }
+}
